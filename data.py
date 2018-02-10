@@ -1,10 +1,13 @@
-import requests, lxml.html 
+"""
+Author: Maximilien Zaleski © 2018
+
+"""
+
+import requests, lxml.html, re, datetime, time
 from bs4 import BeautifulSoup
-import re
-import datetime, time
 
 def dataCollection(name, pwd):
-    # Login
+    # ==== Login ====
     r = requests.session()
 
     # Getting all Hidden tags
@@ -27,58 +30,73 @@ def dataCollection(name, pwd):
     # Gathering the route for /user/[id]/bot-activity
     soup = BeautifulSoup(response.text, "lxml")
     a = str(soup.select_one("a[href*=/bot-activity]"))
-    id_ = re.search('<a href="(.*)">Bot activity</a>', a)
+    
+    try:
+        id_ = re.search('<a href="(.*)">Bot activity</a>', a)
+    
+    except AttributeError:
+        pass
+    
     activity_route = 'https://www.ros-bot.com%s?item_destination=2&item_quality=All&ancient=All' % (id_.group(1), )
     # activity_route = 'https://www.ros-bot.com%s' % (id_.group(1), )
     
-    # Gathering data
+    # ============ Gathering data ============ 
     sauce = r.get(activity_route)
     soup = BeautifulSoup(sauce.text, 'lxml')
     
-    # date & time
+    # ==== date & time ====
     time_ago_index = dict()
+    
     count = 0
     for t in soup.find_all('small'):
         time_ago = re.findall(r'[0-9]{1,2}\s[(min)|(hours)]{3,5}\s[0-9]{1,2}\s[(min\sago)|(ssec\sago)]{7}', t.text)
         try:
             time_ago_index[count] = time_ago[0]
+            
+            count += 1
+        
         except IndexError:
             pass
-        count += 1
 
     today_date = datetime.date.today()
     date = today_date.strftime('%d/%m/%y')
 
-    # Item
-    # - title
-    item_title_index = dict()
-    count = 0
-    # for item in soup.find_all('span', attrs={'data-content': True}):
-    #     print(item[0])
-    # print(item_title_index)
-
-    items = soup.find_all('span', attrs={'data-content': True})
-    item = items[0]
-    item = str(item['data-content'])
-
-    print(item.replace('<br />', ''))
+    # ==== Items ====
+    # - name
+    item_name_index = dict()
     
-
+    count = 0
+    for item_name in soup.find_all('span', attrs={'data-content': True}):
+        item_name = item_name.text
+        try:
+            item_name = re.search('ncient.\s(.*)', item_name)
             
-   
-   
-   
-   
-   
-   
-   
-   
-   
-   
+            item_name = item_name.group(1)
+            item_name_index[count] = item_name.capitalize()
+            
+            count += 1
+        
+        except AttributeError:
+            pass 
+    
+    # - Stats
+    item_PrimaryStats_index = dict()
+    item_SecondaryStats_index = dict()
+    
+    count = 0
+    for stats in soup.find_all('span', attrs={'data-content': True}):
+        stats = str(stats['data-content']).replace('<br />', '')
+        try: 
+            stats = re.search('Primary(.*)Secondary(.*)', stats, re.DOTALL)
+            
+            primary_stats = stats.group(1)
+            item_PrimaryStats_index[count] = primary_stats
+            
+            secondary_stats = stats.group(2)
+            item_SecondaryStats_index[count] = secondary_stats
+            
+            count += 1
 
-    # for d in range(len(item_title_index)):
-    #     print("%s - %s %s" % (date, time_ago_index[d],item_title_index[d], ))
-    # >>> <strong class="text-Primal">[Primal ancient]</strong> dayntee's binding
-    # for item in soup.find_all('span', attrs={'data-content': True}):
-    #     item = item.string
-    #     print(item)
+        except AttributeError:
+            pass
+   
