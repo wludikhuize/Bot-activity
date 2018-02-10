@@ -44,12 +44,15 @@ def dataCollection(name, pwd):
     sauce = r.get(activity_route)
     soup = BeautifulSoup(sauce.text, 'lxml')
     
+    number_of_rows = soup.find_all('div', class_="timeline-item")
+    counter = len(number_of_rows)
+
     # ==== date & time ====
     time_ago_index = dict()
     
     count = 0
     for t in soup.find_all('small'):
-        time_ago = re.findall(r'[0-9]{1,2}\s[(min)|(hours)]{3,5}\s[0-9]{1,2}\s[(min\sago)|(ssec\sago)]{7}', t.text)
+        time_ago = re.findall(r'[0-9]{1,2}\s[(min)|(hours)|(day)]{3,5}\s[0-9]{1,2}\s[(min\sago)|(ssec\sago)]{7}', t.text)
         try:
             time_ago_index[count] = time_ago[0]
             
@@ -100,3 +103,4 @@ def dataCollection(name, pwd):
         except AttributeError:
             pass
    
+    # Max for you tomorrow you need to do: [Ancient] / [Primal] set y/o
