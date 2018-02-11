@@ -67,20 +67,33 @@ def dataCollection(name, pwd):
     # ==== Items ====
     # - name
     item_name_index = dict()
+    item_legendaryType_index =dict()
     
     count = 0
     for item_name in soup.find_all('span', attrs={'data-content': True}):
+        item_type = item_name['class'][0]        
         item_name = item_name.text
         try:
             item_name = re.search('ncient.\s(.*)', item_name)
             
             item_name = item_name.group(1)
             item_name_index[count] = item_name.capitalize()
+
+            # if item_type == 'text-Legendary':
+            #     item_legendaryType_index[item_name.capitalize()] = 'legendary'
             
+            # elif item_type == 'text-Set':
+            #     item_legendaryType_index[item_name.capitalize()] = 'set'
+            
+            # elif item_type == 'text-Primal':
+            #     item_legendaryType_index[item_name.capitalize()] = 'primal'
+                
             count += 1
         
         except AttributeError:
             pass 
+        
+    print(item_legendaryType_index)
     
     # - Stats
     item_PrimaryStats_index = dict()
@@ -104,3 +117,10 @@ def dataCollection(name, pwd):
             pass
    
     # Max for you tomorrow you need to do: [Ancient] / [Primal] set y/o
+    # Allow mutiples values for entries
+    
+    # class Item ()
+    #     def __init__(name, type, index):
+    #         self.name = name
+    #         self.type = type
+    #         self.index = index
