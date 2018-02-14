@@ -10,6 +10,7 @@ def dataCollection(name, pwd):
     # ==== Login ====
     r = requests.session()
 
+
     # Getting all Hidden tags
     login_url = 'https://www.ros-bot.com/user/login'
     login = r.get(login_url)
@@ -66,32 +67,34 @@ def dataCollection(name, pwd):
 
     # ==== Items ====
     
-    # - name
+    # - name & type
     item_name_index = dict()
     
     count = 0
     for item_name in soup.find_all('span', attrs={'data-content': True}):
-        item_type = item_name['class'][0]        
+        stong_tag = item_name.find_all('strong', class_='text-Primal')
+        item_type = item_name['class']
+        
         item_name = item_name.text
         try:
             item_name = re.search('ncient.\s(.*)', item_name)
             item_name = item_name.group(1)
     
-            if item_type == 'text-Legendary':
-                item_name_index[count] = item_name.capitalize(), 'ancient'
+            # if item_type == 'text-Legendary':
+            #     item_name_index[count] = item_name.capitalize(), 'ancient'
 
-            elif item_type == 'text-Set':
-                item_name_index[count] = item_name.capitalize(), 'set'
+            # elif item_type == 'text-Set':
+            #     item_name_index[count] = item_name.capitalize(), 'set'
             
-            elif item_type == 'text-Primal':
-                item_name_index[count] = item_name.capitalize(), 'primal'
+            # elif item_type == 'text-Primal':
+            #     item_name_index[count] = item_name.capitalize(), 'primal'
 
             count += 1
         
         except AttributeError:
             pass 
         
-    print(item_name_index)
+    # print(item_name_index)
     
     # - Stats
     item_PrimaryStats_index = dict()
@@ -116,7 +119,9 @@ def dataCollection(name, pwd):
   
     # class Item ()
     #     def __init__(name, type, index):
-    #         self.name = name
-    #         self.type = type
-    #         self.index = index
+            
+
+
+
+
 
