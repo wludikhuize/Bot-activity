@@ -69,6 +69,45 @@ def dataCollection(name, pwd):
     # ============ Gathering data ============ 
     sauce = r.get(activity_route)
     soup = BeautifulSoup(sauce.text, 'lxml')
+    span = soup.find_all('span', attrs={'data-content': True})
+    
+    for s in span:
+        if s.findChildren('strong'):
+            
+            class_tag = s['class'][0]
+            stats = str(s['data-content']).replace('<br />', '')
+   
+    # name & type
+            name = s.text
+            
+            try:
+                strong = s.find('strong')
+                strong = strong.text
+                
+                if strong == "[Primal ancient]":
+                    type_ = "primal" 
+                elif strong == "[Ancient]":
+                    type_ = "ancient"
+                elif class_tag == "text-Set":
+                    type_ = "set"
+
+            except AttributeError:
+                pass
+   
+    # stats - primary & secondary 
+            try: 
+                stats = re.search('Primary(.*)Secondary(.*)', stats, re.DOTALL)
+                
+                primary = stats.group(1)
+                secondary = stats.group(2)
+                
+            except AttributeError:
+                primary = "N/A"
+                secondary = "N/A"
+
+    # time & date
+   
+
     
 
     # ================================================================================================================================ #
