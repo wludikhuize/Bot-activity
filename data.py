@@ -7,13 +7,15 @@ import requests, lxml.html, re, datetime, time
 from bs4 import BeautifulSoup
 
 class Item (object):
-    def __init__(self, name, type_, primary, secondary, time, date):
+    def __init__(self, name, type_, primary, secondary):
         self.name = name
         self.type_ = type_
         self.primary = primary
         self.secondary = secondary
-        self.time = time
-        self.date = date
+        # self.time = time
+        # self.date = date
+
+items = list()
             
 def dataCollection(name, pwd):
     '''
@@ -30,7 +32,6 @@ def dataCollection(name, pwd):
         For earch span tag, we retreive the data-content attribute. We devide said attribute by primary & secondary stats. 
 
         3. We sort the data.
-        Each data type is sorted into a dictionary with it's index key. The idea is to loop through every single dict and assign all the data to the object values. 
     '''
     
     # ============ Login ============
@@ -75,21 +76,25 @@ def dataCollection(name, pwd):
         if s.findChildren('strong'):
             
             class_tag = s['class'][0]
+            print(class_tag)
             stats = str(s['data-content']).replace('<br />', '')
    
     # name & type
             name = s.text
-            
+            name = re.search('ncient.\s(.*)', name)
+            name = name.group(1)
+        
             try:
                 strong = s.find('strong')
                 strong = strong.text
                 
-                if strong == "[Primal ancient]":
+                if class_tag == "text-Set":
+                    type_ = "set"
+                elif strong == "[Primal ancient]":
                     type_ = "primal" 
                 elif strong == "[Ancient]":
                     type_ = "ancient"
-                elif class_tag == "text-Set":
-                    type_ = "set"
+                
 
             except AttributeError:
                 pass
@@ -106,9 +111,15 @@ def dataCollection(name, pwd):
                 secondary = "N/A"
 
     # time & date
-   
-
     
+    # new Item():
+            item = Item(name, type_, primary, secondary)
+            items.append(item)
+
+def returnAllValues():
+    for i in items:
+        print(i.name, i.type_)
+
 
     # ================================================================================================================================ #
 
@@ -129,69 +140,3 @@ def dataCollection(name, pwd):
 
     # today_date = datetime.date.today()
     # date = today_date.strftime('%d/%m/%y')
-
-    # # ==== Items ====
-    
-    # # - name & type
-    # item_name_index = dict()
-    # item_type_index = dict()
-    
-    # count = 0
-    # for item_name in soup.find_all('span', attrs={'data-content': True}):
-    #     strong_tag = item_name.find_all('strong', class_='text-Primal')
-    #     item_type = item_name['class']
-        
-    #     item_name = item_name.text
-    #     try:
-    #         item_name = re.search('ncient.\s(.*)', item_name)
-    #         item_name = item_name.group(1)
-    #         item_name_index[count] = item_name
-
-    #         if strong_tag:
-    #             item_type_index[count] = "primal"
-    #         elif item_type[0] == "text-Legendary":
-    #             item_type_index[count] = "legendary"
-    #         elif item_type[0] == "text-Set":
-    #             item_type_index[count] = "set"
-            
-    #         count += 1
-        
-    #     except AttributeError:
-    #         pass 
-
-
-    # # print(item_name_index, item_type_index)
-            
-        
-    # # print(item_name_index)
-    
-    # # - Stats
-    # item_PrimaryStats_index = dict()
-    # item_SecondaryStats_index = dict()
-    
-    # count = 0
-    # for stats in soup.find_all('span', attrs={'data-content': True}):
-    #     stats = str(stats['data-content']).replace('<br />', '')
-        
-    #     try: 
-    #         stats = re.search('Primary(.*)Secondary(.*)', stats, re.DOTALL)
-            
-    #         primary_stats = stats.group(1)
-    #         item_PrimaryStats_index[count] = primary_stats
-            
-    #         secondary_stats = stats.group(2)
-    #         item_SecondaryStats_index[count] = secondary_stats
-            
-    #         count += 1
-
-            
-
-    #     except AttributeError:
-    #         pass
-  
-
-
-
-
-
-
